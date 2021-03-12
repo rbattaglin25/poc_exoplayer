@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">POC-eBatuque-android</string>
+    <string name="musica_pausada">Musica Pausada!</string>
 </resources>
