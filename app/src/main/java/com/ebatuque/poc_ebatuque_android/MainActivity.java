@@ -23,9 +23,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttonPlay.setOnClickListener(this);
         buttonPause.setOnClickListener(this);
 
-        serviceIntent = new Intent(getApplicationContext(), Musicservice.class);
-
-
+        serviceIntent = new Intent(getApplicationContext(), MusicService.class);
 
     }
 
@@ -33,10 +31,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.buttonPlay:
-                startService(new Intent(getApplicationContext(),Musicservice.class));
+                startService(serviceIntent);
                 break;
             case R.id.buttonPause:
-                stopService(new Intent(getApplicationContext(),Musicservice.class));
+                stopService(serviceIntent);
                 break;
         }
 
