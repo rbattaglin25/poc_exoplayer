@@ -1,43 +1,45 @@
 package com.ebatuque.poc_ebatuque_android;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
-import android.media.AudioManager;
-import android.media.AudioTrack;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.PowerManager;
 import android.view.View;
 import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
-//    private Intent serviceIntent;
-    private Button buttonPlay, buttonPause;
+    private Button buttonPlayEP, buttonPauseEP, buttonPlayMP, buttonPauseMP;
+    private AudioServiceExoPlayer audioServiceExoPlayer;
+    private AudioServiceMediaPlayer audioServiceMediaPlayer;
 
-    private AudioService audioService;
+    String rhythm = "choro_with_recoreco";
+//    String rhythm = "reco_reco";
+//    String rhythm = "choro_with_reco_dynamic";
+//    String rhythm = "choro_remove_reco";
+//    String rhythm = "choro_replace_reco_for_le";
+//    String rhythm = "choro_replace_reco_for_xequere";
+//    String rhythm = "xequere_agogo";
 
+    float speed = 1.3f;
+    float volume = 1.0f;
 
-    String rhythm = "choro_medio_92";
-    int tempoCurrent = 92;
-    int tempoStandard = 92;
-
-
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        buttonPlay = findViewById(R.id.buttonPlay);
-        buttonPause = findViewById(R.id.buttonPause);
+        buttonPlayEP = findViewById(R.id.buttonPlay);
+        buttonPauseEP = findViewById(R.id.buttonPause);
+        buttonPlayMP = findViewById(R.id.playMediaPlayer);
+        buttonPauseMP = findViewById(R.id.pauseMediaPlayer);
 
-        buttonPlay.setOnClickListener(this);
-        buttonPause.setOnClickListener(this);
+        buttonPlayEP.setOnClickListener(this);
+        buttonPauseEP.setOnClickListener(this);
+        buttonPlayMP.setOnClickListener(this);
+        buttonPauseMP.setOnClickListener(this);
 
-        audioService = new AudioService(getApplicationContext(),rhythm, tempoCurrent, tempoStandard);
+        audioServiceExoPlayer = new AudioServiceExoPlayer(getApplicationContext(),rhythm, speed,volume);
+        audioServiceMediaPlayer = new AudioServiceMediaPlayer(getApplicationContext(),rhythm, volume,speed);
 
     }
 
@@ -45,10 +47,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.buttonPlay:
-                audioService.play();
+                audioServiceExoPlayer.play();
                 break;
             case R.id.buttonPause:
-                audioService.stop();
+                audioServiceExoPlayer.stop();
+                break;
+            case R.id.playMediaPlayer:
+                audioServiceMediaPlayer.start();
+//                audioServiceMediaPlayer.setVolume();
+//                audioServiceMediaPlayer.rate();
+                break;
+            case R.id.pauseMediaPlayer:
+                audioServiceMediaPlayer.onDestroy();
+                audioServiceMediaPlayer = new AudioServiceMediaPlayer(getApplicationContext(),rhythm,volume,speed);
                 break;
         }
     }
