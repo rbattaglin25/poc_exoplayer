@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //    String rhythm = "choro_replace_reco_for_xequere";
 //    String rhythm = "xequere_agogo";
 
-    float speed = 1.3f;
+    float speed = 1.0f;
     float volume = 1.0f;
 
     @Override

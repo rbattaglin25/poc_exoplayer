@@ -32,13 +32,9 @@ public class AudioServiceExoPlayer extends Service {
 
     int[] outputChannels = {1, 1};
     float[] outputChannelsVolume = {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f};
-
     String loopFile;
-
     String RES_RAW = "raw";
-
     SimpleExoPlayer player;
-
     final int sampleRate = 44100;
 
 
@@ -147,8 +143,7 @@ public class AudioServiceExoPlayer extends Service {
 
         player.play();
 
-//        simpleExoPlayers.setPlayWhenReady(true);
-//        simpleExoPlayers.prepare(loopingSource);
+
     }
 
     public void stop(){
@@ -157,9 +152,6 @@ public class AudioServiceExoPlayer extends Service {
     }
 
 
-//    public void release(){
-//        simpleExoPlayers.release();
-//    }
 
     private AudioProcessor[] buildAudioProcessors() {
 
