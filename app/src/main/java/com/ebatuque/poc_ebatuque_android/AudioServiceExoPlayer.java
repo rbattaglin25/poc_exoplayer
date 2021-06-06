@@ -44,7 +44,6 @@ public class AudioServiceExoPlayer extends Service {
 
         DefaultRenderersFactory defaultRenderersFactory = new DefaultRenderersFactory(context)
         {
-
             @Nullable
             @Override
             protected AudioSink buildAudioSink(Context context,
@@ -54,19 +53,15 @@ public class AudioServiceExoPlayer extends Service {
                 return new DefaultAudioSink(AudioCapabilities.getCapabilities(context),
                         new DefaultAudioSink.DefaultAudioProcessorChain(buildAudioProcessors()),
                         enableFloatOutput,
-                        enableAudioTrackPlaybackParams,
-                        enableOffload);
+                        enableAudioTrackPlaybackParams, DefaultAudioSink.OFFLOAD_MODE_DISABLED);
             }
         };
 
         player = new SimpleExoPlayer.Builder(context,defaultRenderersFactory).build();
-
         final int resID = context.getResources().getIdentifier(loopFile,
                 RES_RAW, context.getPackageName());
         Uri uri = RawResourceDataSource.buildRawResourceUri(resID);
-
         MediaItem mediaItem = MediaItem.fromUri(uri);
-
         player.setMediaItem(mediaItem);
         player.setVolume(volume);
         player.setRepeatMode(player.REPEAT_MODE_ALL);
@@ -77,7 +72,7 @@ public class AudioServiceExoPlayer extends Service {
 //      It is based on the last saved value (or the initial value when played for first time)
         int channelCount  = 4;
         int[] instrPanLeftArray = {50,50,50,50};
-        int[] instrVolumeArray = {100,100,100,100,100,100,100,100};
+        int[] instrVolumeArray = {100,100,100,100};
 
         for (int i = 0; i < channelCount; i++) {
             setOutputChannelsVolume(i,instrPanLeftArray,instrVolumeArray);

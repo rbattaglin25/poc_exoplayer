@@ -12,16 +12,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private AudioServiceExoPlayer audioServiceExoPlayer;
     private AudioServiceMediaPlayer audioServiceMediaPlayer;
 
-    String rhythm = "choro_with_recoreco";
-//    String rhythm = "reco_reco";
-//    String rhythm = "choro_with_reco_dynamic";
-//    String rhythm = "choro_remove_reco";
-//    String rhythm = "choro_replace_reco_for_le";
-//    String rhythm = "choro_replace_reco_for_xequere";
-//    String rhythm = "xequere_agogo";
+    String rhythm = "xote_comp10";
+//    String rhythm = "xote_comp7";
+//    String rhythm = "xote_comp5";
+//    String rhythm = "xote_comp3";
+//    String rhythm = "xote_comp0";
+//    String rhythm = "xote_comp10_removing_reco";
+//    String rhythm = "xote_comp0_cut17db_reco";
+
 
     float speed = 1.0f;
-    float volume = 1.0f;
+    float volume = 0.5f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
