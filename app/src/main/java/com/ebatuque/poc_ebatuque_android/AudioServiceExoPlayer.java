@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
+import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -17,17 +18,11 @@ import com.google.android.exoplayer2.audio.AudioCapabilities;
 import com.google.android.exoplayer2.audio.AudioProcessor;
 import com.google.android.exoplayer2.audio.AudioSink;
 import com.google.android.exoplayer2.audio.DefaultAudioSink;
-import com.google.android.exoplayer2.source.LoopingMediaSource;
-import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.ProgressiveMediaSource;
-import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.audio.ForwardingAudioSink;
 import com.google.android.exoplayer2.upstream.RawResourceDataSource;
-import com.google.android.exoplayer2.util.Util;
 
 public class AudioServiceExoPlayer extends Service {
 
-    SimpleExoPlayer simpleExoPlayers;
     ChannelMappingAudioProcessor channelMappingAudioProcessor;
 
     int[] outputChannels = {1, 1};
@@ -36,8 +31,7 @@ public class AudioServiceExoPlayer extends Service {
     String RES_RAW = "raw";
     SimpleExoPlayer player;
     final int sampleRate = 44100;
-
-
+    final int bufferSize = 50000;
 
     public AudioServiceExoPlayer(Context context, String loopFile, float speed, float volume){
         this.loopFile = loopFile;
@@ -50,11 +44,31 @@ public class AudioServiceExoPlayer extends Service {
                                                boolean enableFloatOutput,
                                                boolean enableAudioTrackPlaybackParams,
                                                boolean enableOffload) {
-                return new DefaultAudioSink(AudioCapabilities.getCapabilities(context),
+
+                AudioSink audioSink = new DefaultAudioSink(AudioCapabilities.getCapabilities(context),
                         new DefaultAudioSink.DefaultAudioProcessorChain(buildAudioProcessors()),
                         enableFloatOutput,
-                        enableAudioTrackPlaybackParams, DefaultAudioSink.OFFLOAD_MODE_DISABLED);
+                        enableAudioTrackPlaybackParams,
+                        DefaultAudioSink.OFFLOAD_MODE_DISABLED);
+
+                ForwardingAudioSink forwardingAudioSink = new ForwardingAudioSink(audioSink);
+
+                try {
+                    Format format = new Format.Builder().build().buildUpon()
+                            .setChannelCount(outputChannelsVolume.length)
+                            .setPcmEncoding(C.ENCODING_PCM_16BIT)
+                            .setSampleMimeType("audio/vorbis")
+                            .setSampleRate(sampleRate).build();
+
+                    forwardingAudioSink.configure(format, bufferSize, outputChannels);
+                } catch (AudioSink.ConfigurationException e) {
+                    e.printStackTrace();
+                }
+
+                return forwardingAudioSink;
             }
+
+
         };
 
         player = new SimpleExoPlayer.Builder(context,defaultRenderersFactory).build();
@@ -98,9 +112,9 @@ public class AudioServiceExoPlayer extends Service {
      */
     public void setOutputChannelsVolume(int instrumentIndex,int[] instrPanLeftArray, int[] instrVolumeArray) {
         try {
-
-            float instrumentChannelLeft = (float) instrVolumeArray[instrumentIndex]/100;
-            float instrumentChannelRight = (float) instrVolumeArray[instrumentIndex]/100;
+            float volumeLimeter = 0.5f;
+            float instrumentChannelLeft = (float) instrVolumeArray[instrumentIndex]/100*volumeLimeter;
+            float instrumentChannelRight = (float) instrVolumeArray[instrumentIndex]/100*volumeLimeter;
             float adjustmentFactor = 1;
             int centralPosition = 50;
             int maxVolume = 100;
@@ -112,13 +126,11 @@ public class AudioServiceExoPlayer extends Service {
                 instPanLeft = Math.min(instPanLeft, maxVolume);
                 adjustmentFactor = (float) (maxVolume - ((instPanLeft - centralPosition)*2))/100;
                 instrumentChannelRight = instrumentChannelRight*adjustmentFactor;
-
             }else if(instrPanLeftArray[instrumentIndex] < centralPosition){
                 int instPanRight = instrPanLeftArray[instrumentIndex];
                 instPanRight = Math.max(instPanRight, 0);
                 adjustmentFactor = (float) (maxVolume - ((centralPosition - instPanRight)*2))/100;
                 instrumentChannelLeft = instrumentChannelLeft*adjustmentFactor;
-
             }
             outputChannelsVolume[leftChannelIdx] = instrumentChannelLeft;
             outputChannelsVolume[rightChannelIdx] = instrumentChannelRight;
